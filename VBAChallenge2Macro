@@ -1,0 +1,82 @@
+Sub VBAChallenge()
+
+    'Loop through worksheets
+    For Each sh In Worksheets
+    
+    
+        
+        'Variable Names
+        Dim currow As Long
+        Dim starrow As Long
+        Dim rowcount As Long
+        Dim stockcount As Long
+        Dim counter As Long
+        Dim Per As Double
+        
+        
+        'Worksheet names
+        Dim Worksheet As String
+        Worksheet = sh.Name
+    
+    
+        'Lables
+        sh.Range("I1").Value = "<ticker>"
+        sh.Range("J1").Value = "<Year Change>"
+        sh.Range("K1").Value = "<Percent Change>"
+        sh.Range("L1").Value = "<Total Volume>"
+        
+        'Starting row
+        starrow = 2
+        
+        counter = 2
+        
+        'Finding the last row with stack Overflow
+        rowcount = sh.Cells(Rows.Count, 1).End(xlUp).Row
+            
+            'Looping through the rosh
+            For currow = 2 To rowcount
+            
+                'If the values from the next ticker column 1 are not equal to the current ticker from column 1 then fill the cell
+                'in column 9 with the value
+                If sh.Cells(currow + 1, 1) <> sh.Cells(currow, 1).Value Then
+                sh.Cells(counter, 9).Value = sh.Cells(currow, 1).Value
+                
+                'Calculating change from beginning to end of the year
+                sh.Cells(counter, 10).Value = sh.Cells(currow, 6).Value - sh.Cells(starrow, 3).Value
+                
+                'The yearly change column, if less than zero make the cell red/salmon otherwise
+                If sh.Cells(counter, 10).Value < 0 Then
+                sh.Cells(counter, 10).Interior.ColorIndex = 3
+                Else
+                sh.Cells(counter, 10).Interior.ColorIndex = 4
+                End If
+                
+                'Percentage Change Column
+                If sh.Cells(starrow, 3).Value <> 0 Then
+                Per = ((sh.Cells(currow, 6).Value - sh.Cells(starrow, 3).Value) / sh.Cells(starrow, 3).Value)
+                sh.Cells(counter, 11).Value = Format(Per, "Percent")
+                
+                Else
+                
+                'If zero then 0%
+                sh.Cells(counter, 11).Value = Format(0, "Percent")
+                End If
+                
+                'Total Volume
+                sh.Cells(counter, 12).Value = WorksheetFunction.Sum(Range(sh.Cells(starrow, 7), sh.Cells(currow, 7)))
+                
+                    counter = counter + 1
+                    starrow = currow + 1
+            
+                End If
+                
+             Next currow
+             
+            Worksheets(Worksheet).Columns("A:L").AutoFit
+            
+                
+    Next sh
+    
+
+
+End Sub
